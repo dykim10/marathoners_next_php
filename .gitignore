@@ -1,0 +1,5 @@
+/vendor/
+composer.lock
+/writable/
+.env
+/node_modules/
