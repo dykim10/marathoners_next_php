@@ -68,4 +68,26 @@ class AuthController extends ResourceController
             return $this->failServerError('토큰 검증 중 오류가 발생했습니다.');
         }
     }
+
+    public function logout()
+    {
+        log_message('info', '🔹 로그아웃 요청 수신');
+
+        // ✅ 요청에서 쿠키 값 가져오기
+        $token = $_COOKIE['token'] ?? null;
+
+        if (!$token) {
+            return $this->response
+                ->setStatusCode(401)
+                ->setJSON(['error' => 'No token provided']);
+        }
+
+        // ✅ 서버에서 쿠키 만료 처리 (토큰 제거)
+        setcookie("token", "", time() - 3600, "/", "", true, true);
+
+        return $this->response
+            ->setStatusCode(200)
+            ->setJSON(['success' => true, 'message' => '로그아웃 성공']);
+    }
+
 }
