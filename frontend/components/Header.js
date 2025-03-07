@@ -14,11 +14,14 @@ export default function Header() {
 
     useEffect(() => {
         const verifySession = async () => {
+            console.log("🔹 세션 확인 중...");
             const sessionData = await checkSession();
+            console.log("🔹 세션 데이터:", sessionData);
+
             setIsLoggedIn(sessionData.success);
             setUser(sessionData.user);
-
         };
+
         verifySession();
     }, []);
 
@@ -28,14 +31,22 @@ export default function Header() {
 
     const handleLogout = async () => {
         try {
-            await fetch("/api/logout", {
+            const response = await fetch("/api/logout", {
                 method: "POST",
                 credentials: "include",
             });
-            setIsLoggedIn(sessionData.success);
-            window.location.href = "/";
+
+            if (!response.ok) {
+                throw new Error("로그아웃 요청 실패");
+            }
+
+            console.log("🔹 로그아웃 성공!");
+            setIsLoggedIn(false);
+            setUser(null);
+
+            router.push("/"); // ✅ SPA 방식으로 이동
         } catch (error) {
-            console.error("로그아웃 실패:", error);
+            console.error("❌ 로그아웃 실패:", error);
         }
     };
 
@@ -43,24 +54,24 @@ export default function Header() {
         <Navbar bg="dark" variant="dark" expand="lg" className="py-3 shadow-sm">
             <Container>
                 {/* 좌측: 로고 및 메뉴 */}
-                <Navbar.Brand as={Link} href="/" className="fw-bold text-light me-3">
+                <Navbar.Brand href="/" className="fw-bold text-light me-3">
                     Team PAC
                 </Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">
                         {/* ✅ 대회 일정 */}
-                        <Nav.Link href="/race/list">대회 일정</Nav.Link>
+                        <Nav.Link as={Link} href="/race/list">대회 일정</Nav.Link>
 
                         {/* ✅ 대회 리뷰 */}
-                        <Nav.Link href="/review/list">대회 리뷰</Nav.Link>
+                        <Nav.Link as={Link} href="/review/list">대회 리뷰</Nav.Link>
 
                         {/* ✅ 주요 대회 (하드코딩된 서브메뉴 포함) */}
                         <NavDropdown title="주요 대회" id="major-races-dropdown">
-                            <NavDropdown.Item href="/major/marathon1">🏅 서울 마라톤</NavDropdown.Item>
-                            <NavDropdown.Item href="/major/marathon2">🏅 부산 마라톤</NavDropdown.Item>
-                            <NavDropdown.Item href="/major/marathon3">🏅 대구 국제 마라톤</NavDropdown.Item>
-                            <NavDropdown.Item href="/major/marathon4">🏅 춘천 마라톤</NavDropdown.Item>
+                            <NavDropdown.Item as={Link} href="/major/marathon1">🏅 서울 마라톤</NavDropdown.Item>
+                            <NavDropdown.Item as={Link} href="/major/marathon2">🏅 부산 마라톤</NavDropdown.Item>
+                            <NavDropdown.Item as={Link} href="/major/marathon3">🏅 대구 국제 마라톤</NavDropdown.Item>
+                            <NavDropdown.Item as={Link} href="/major/marathon4">🏅 춘천 마라톤</NavDropdown.Item>
                         </NavDropdown>
                     </Nav>
 
@@ -68,10 +79,10 @@ export default function Header() {
                     <Nav className="ms-auto">
                         {isLoggedIn ? (
                             <>
-                                <Button className="btn btn-danger btn-sm me-2" variant="danger" onClick={handleLogout}>
+                                <Button className="btn btn-danger btn-sm me-2" onClick={handleLogout}>
                                     로그아웃
                                 </Button>
-                                <Button className="btn btn-warning btn-sm" variant="warning" onClick={handleMyInfo}>
+                                <Button className="btn btn-warning btn-sm" onClick={handleMyInfo}>
                                     내 정보
                                 </Button>
                             </>

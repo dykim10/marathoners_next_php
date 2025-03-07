@@ -28,7 +28,7 @@ export default function Home() {
             }
         };
         verifySession();
-        fetchRaceList();
+        //fetchRaceList();
     }, []);
 
     const fetchRaceList = async () => {

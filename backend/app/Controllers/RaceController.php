@@ -19,4 +19,5 @@ use App\Services\RaceService;
 class RaceController extends ResourceController
 {
     private $raceService;
+
 }

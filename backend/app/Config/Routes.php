@@ -7,6 +7,8 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->get('/', 'Home::index');
 
+//test
+$routes->get('/system-info', 'SystemInfo::phpInfo');
 
 /**
  * user login , jwt

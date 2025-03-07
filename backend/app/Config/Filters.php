@@ -69,15 +69,9 @@ class Filters extends BaseFilters
      */
     public array $globals = [
         'before' => [
-            'cors' => ['except' => ['api/*']], // CORS 필터 적용 (api/* 제외)
-            // 'honeypot',
-            // 'csrf',
-            // 'invalidchars',
+            'cors' // ✅ 모든 요청에서 CORS 필터 적용
         ],
-        'after' => [
-            // 'honeypot',
-            // 'secureheaders',
-        ],
+        'after' => [],
     ];
 
     /**

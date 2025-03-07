@@ -7,52 +7,47 @@ import { checkSession } from "@/utils/session"; //
 
 export default function LoginPage() {
     const router = useRouter();
-    const [userId, setUserId] = useState("");
-    const [password, setPassword] = useState("");
+    const [loginId, setLoginId] = useState("");
+    const [loginPassword, setLoginPassword] = useState("");
     const [error, setError] = useState("");
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [user, setUser] = useState(null);
 
+    //로그인 이후 데이터 셋
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [userData, setUserData] = useState(null);
+
+    // ✅ 로그인 상태 확인 (JWT가 쿠키에 존재하는지 검증)
     useEffect(() => {
         const verifySession = async () => {
             const sessionData = await checkSession();
             if (sessionData.success) {
-                setIsLoggedIn(true);
-                setUser(sessionData.user);
-                router.push("/"); // 로그인된 경우 홈으로 리디렉트
-            } else {
-                setIsLoggedIn(false);
-                setUser(null);
+                router.push("/");
             }
         };
-
+        //세션체크하는 공통 모듈 연결
         verifySession();
     }, []);
+
 
     const handleLogin = async (e) => {
         e.preventDefault();
         setError("");
 
         try {
-            const response = await fetch("/api/login", {
+            const response = await fetch("/api/auth/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "Accept": "application/json",
                 },
-                credentials: "include",
-                body: JSON.stringify({ userId, password }),
+                credentials: "include",     // 쿠키를 자동으로 포함
+                body: JSON.stringify({ loginId, loginPassword }),
             });
 
             if (!response.ok) {
                 throw new Error("로그인 실패. 아이디와 비밀번호를 확인하세요.");
             }
 
-            checkSession(); // 로그인 후 세션 체크 실행
-
-            //router.push("/"); //CSR 방식이라, 클라이언트에서 페이지만 바꿔치기라서, 다른 곳 적용이 안되는 모습이 보임.
-            window.location.href = "/"; // ✅ 가장 확실한 방법 (완전한 새로고침)
-
+            window.location.href = "/";     // 새로고침하여 인증 상태 반영
         } catch (error) {
             setError(error.message);
         }
@@ -65,13 +60,13 @@ export default function LoginPage() {
                     <h2 className="text-center mb-4">로그인</h2>
                     {error && <Alert variant="danger">{error}</Alert>}
                     <Form onSubmit={handleLogin}>
-                        <Form.Group className="mb-3" controlId="userId">
+                        <Form.Group className="mb-3" controlId="loginID">
                             <Form.Label>아이디</Form.Label>
                             <Form.Control
                                 type="text"
                                 placeholder="아이디 입력"
-                                value={userId}
-                                onChange={(e) => setUserId(e.target.value)}
+                                value={loginId}
+                                onChange={(e) => setLoginId(e.target.value)}
                                 required
                             />
                         </Form.Group>
@@ -81,8 +76,8 @@ export default function LoginPage() {
                             <Form.Control
                                 type="password"
                                 placeholder="비밀번호 입력"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                value={loginPassword}
+                                onChange={(e) => setLoginPassword(e.target.value)}
                                 required
                             />
                         </Form.Group>
