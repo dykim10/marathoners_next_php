@@ -1,101 +1,134 @@
-import Image from "next/image";
+"use client";
+
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from "react";
+import { Container, Row, Col, Button, Card } from 'react-bootstrap';
+import { checkSession } from "@/utils/session";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    const router = useRouter();
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [user, setUser] = useState(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+    const [raceList, setRaceList] = useState([]); // ✅ 대회 데이터 저장
+
+    useEffect(() => {
+        const verifySession = async () => {
+            try {
+                const sessionData = await checkSession();
+                setIsLoggedIn(sessionData.success);
+                setUser(sessionData.user);
+
+            } catch (error) {
+                console.error("세션 확인 중 오류 발생:", error);
+            }
+        };
+        verifySession();
+        fetchRaceList();
+    }, []);
+
+    const fetchRaceList = async () => {
+        try {
+            const res = await fetch("/api/race/list", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ page: 1, rows: 5 }) // 최신 5개만 불러오기
+            });
+
+            if (!res.ok) throw new Error("Failed to fetch race list");
+
+            const data = await res.json();
+            setRaceList(data.raceList || []); // 데이터 저장
+        } catch (error) {
+            console.error("Error fetching races:", error);
+        }
+    };
+
+    const handleNavigation = (path) => {
+        router.push(path);
+    };
+
+    const sliderSettings = {
+        dots: true,
+        infinite: true,
+        speed: 500,
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        autoplay: true,
+        autoplaySpeed: 3000,
+        arrows: false,
+    };
+
+    return (
+        <Container className="container-lg mt-5 text-center">
+            {/* ✅ 헤딩 섹션 */}
+            <h1 className="fw-bold">Welcome to Marathoners</h1>
+            <p className="text-muted">마라톤을 사랑하는 이들을 위한 공간</p>
+            <hr/>
+
+            {/* ✅ 대회 일정 스와이프 섹션 */}
+            <Container className="mb-5">
+                {raceList.length > 0 ? (
+                    <Slider {...sliderSettings}>
+                        {raceList.map((race, index) => (
+                            <Card key={index} className="shadow-sm">
+                                <Card.Body>
+                                    <Card.Title>{race.mrName}</Card.Title>
+                                    <Card.Text>
+                                        <strong>일정:</strong> {new Date(race.mrStartDt).toLocaleDateString()}
+                                    </Card.Text>
+                                    <Card.Text>
+                                        <strong>장소:</strong> {race.mrLocation}
+                                    </Card.Text>
+                                    <Button variant="primary" size="sm"
+                                            onClick={() => router.push(`/race/view/${race.mrUuid}`)}>
+                                        상세보기
+                                    </Button>
+                                </Card.Body>
+                            </Card>
+                        ))}
+                    </Slider>
+                ) : (
+                    <p>대회 정보를 불러오는 중...</p>
+                )}
+            </Container>
+
+            {/* ✅ 기능 버튼 섹션 */}
+            <Container>
+                <Row className="justify-content-center">
+                    <Col md={4} className="mb-3">
+                        <Card className="shadow-sm">
+                            <Card.Body>
+                                <Card.Title>🏅 대회 일정</Card.Title>
+                                <Card.Text>다가오는 마라톤 대회를 확인하세요.</Card.Text>
+                                <Button variant="primary" onClick={() => handleNavigation("/race/list")}>더 보기</Button>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                    <Col md={4} className="mb-3">
+                        <Card className="shadow-sm">
+                            <Card.Body>
+                                <Card.Title>📝 대회 리뷰</Card.Title>
+                                <Card.Text>참가자들의 솔직한 리뷰를 읽어보세요.</Card.Text>
+                                <Button variant="success" onClick={() => handleNavigation("/review/list")}>더 보기</Button>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                    <Col md={4} className="mb-3">
+                        <Card className="shadow-sm">
+                            <Card.Body>
+                                <Card.Title>📌 기타 메뉴</Card.Title>
+                                <Card.Text>마라톤 관련 다양한 정보를 제공합니다.</Card.Text>
+                                <Button variant="warning" onClick={() => handleNavigation("/feature3")}>더 보기</Button>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                </Row>
+            </Container>
+        </Container>
+    );
 }
