@@ -3,7 +3,7 @@
 export default function Footer() {
     return (
         <footer className="bg-dark text-white text-center py-3 mt-5">
-            <p>&copy; 2025 Marathoners. All Rights Reserved.</p>
+            <p>&copy; 2025 Team PAC. All Rights Reserved.</p>
         </footer>
     );
 }

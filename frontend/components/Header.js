@@ -44,7 +44,7 @@ export default function Header() {
             <Container>
                 {/* 좌측: 로고 및 메뉴 */}
                 <Navbar.Brand as={Link} href="/" className="fw-bold text-light me-3">
-                    Marathoners
+                    Team PAC
                 </Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">

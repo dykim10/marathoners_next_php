@@ -66,8 +66,8 @@ export default function Home() {
     return (
         <Container className="container-lg mt-5 text-center">
             {/* ✅ 헤딩 섹션 */}
-            <h1 className="fw-bold">Welcome to Marathoners</h1>
-            <p className="text-muted">마라톤을 사랑하는 이들을 위한 공간</p>
+            <h1 className="fw-bold">Welcome to Team PAC</h1>
+            <p className="text-muted">팀팩 러너스 환영 공간</p>
             <hr/>
 
             {/* ✅ 대회 일정 스와이프 섹션 */}
