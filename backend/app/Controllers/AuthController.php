@@ -39,21 +39,21 @@ class AuthController extends ResourceController
     {
         try {
 
-            //log_message('debug', '🔹 요청 수신: verifyToken() 실행됨');
+            log_message('debug', '🔹 요청 수신: verifyToken() 실행됨');
 
             // ✅ 전체 쿠키 로그 확인
-            //log_message('debug', '🔹 $_SERVER[HTTP_COOKIE]: ' . ($_SERVER['HTTP_COOKIE'] ?? '없음'));
-            //log_message('debug', '🔹 $_COOKIE 데이터: ' . json_encode($_COOKIE));
+            log_message('debug', '🔹 $_SERVER[HTTP_COOKIE]: ' . ($_SERVER['HTTP_COOKIE'] ?? '없음'));
+            log_message('debug', '🔹 $_COOKIE 데이터: ' . json_encode($_COOKIE));
 
             // ✅ Authorization 헤더에서 JWT 가져오기 (API 테스트용)
             $authHeader = $this->request->getHeaderLine('Authorization');
             if ($authHeader && strpos($authHeader, 'Bearer ') === 0) {
                 $token = str_replace('Bearer ', '', $authHeader);
-                //log_message('debug', '🔹 Authorization 헤더에서 JWT 추출: ' . $token);
+                log_message('debug', '🔹 Authorization 헤더에서 JWT 추출: ' . $token);
             } else {
                 // ✅ HTTP-Only Secure 쿠키에서 JWT 가져오기 (브라우저 요청용)
                 $token = $_COOKIE['token'] ?? null;
-                //log_message('debug', '🔹 HTTP-Only Secure 쿠키에서 JWT 추출: ' . ($token ? '있음' : '없음'));
+                log_message('debug', '🔹 HTTP-Only Secure 쿠키에서 JWT 추출: ' . ($token ? '있음' : '없음'));
             }
 
             if (!$token) {
@@ -64,7 +64,7 @@ class AuthController extends ResourceController
             return $this->respond($result, $result['success'] ? 200 : 401);
         } catch (Exception $e) {
 
-            //log_message('error', '❌ JWT 검증 오류: ' . $e->getMessage());
+            log_message('error', '❌ JWT 검증 오류: ' . $e->getMessage());
             return $this->failServerError('토큰 검증 중 오류가 발생했습니다.');
         }
     }

@@ -50,7 +50,7 @@ class AuthService
                 'path' => '/',
                 'secure' => false,  // ✅ HTTPS 환경에서는 true로 변경해야 함
                 'httponly' => true,  // ✅ JavaScript 접근 차단 (XSS 방지)
-                'samesite' => 'None' // ✅ PHP가 쿠키를 감지하지 못하면 'None'으로 변경 후 테스트
+                'samesite' => 'Lax' // ✅ PHP가 쿠키를 감지하지 못하면 'None'으로 변경 후 테스트
             ]);
 
             return [
