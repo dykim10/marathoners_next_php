@@ -1,6 +1,7 @@
 "use client";
 
-import UserForm from "@/app/components/UserForm";
+//import Header from '../components/Header';
+import UserForm from "@/components/UserForm";
 import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {

@@ -27,7 +27,7 @@ class UserService
     {
         // 데이터 유효성 검사
         $validator = Validator::make($userData, [
-            'email' => 'required|email|unique:users',
+            'email' => 'required|valid_email|is_unique[tb_users.user_email]',    //CI4 tb_users 테이블의 user_email
             'password' => 'required|min:8',
             'name' => 'required|string|max:255',
         ]);

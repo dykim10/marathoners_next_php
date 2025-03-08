@@ -1,6 +1,6 @@
 "use client";
 
-import UserForm from "@/app/components/UserForm";
+import UserForm from "@/components/UserForm";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
