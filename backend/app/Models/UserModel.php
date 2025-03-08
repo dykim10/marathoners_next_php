@@ -43,4 +43,14 @@ class UserModel extends Model
         return null;
     }
 
+    public function updateUser(string $userId, array $data): bool
+    {
+        return $this->where('user_id', $userId)->update($data);
+    }   
+
+    public function deleteUser(string $userId): bool
+    {
+        return $this->where('user_id', $userId)->delete();
+    }
+    
 }
