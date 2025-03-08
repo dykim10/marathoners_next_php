@@ -31,5 +31,16 @@ class UserModel extends Model
         return $this->insert($user);
     }
 
+    public function createUser(array $data): ?UserEntity
+    {
+        $user = new UserEntity();
+        $user->fill($data);
+        
+        if ($this->saveUser($user)) {
+            return $user;
+        }
+        
+        return null;
+    }
 
 }
