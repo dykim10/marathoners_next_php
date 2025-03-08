@@ -7,82 +7,78 @@ use CodeIgniter\Entity\Entity;
 class Race extends Entity
 {
     protected $attributes = [
-        'id' => null,
-        'race_name' => null,
-        'race_date' => null,
-        'location' => null,
-        'distance' => null,
-        'max_participants' => null,
-        'registration_fee' => null,
-        'description' => null,
-        'status' => null,
-        'created_at' => null,
-        'updated_at' => null,
-        'deleted_at' => null,
+        'mr_uuid' => null,
+        'mr_name' => null,
+        'mr_start_dt' => null,
+        'mr_location' => null,
+        'mr_content' => null,
+        'mr_company' => null,
+        'mr_reg_adm' => null,
+        'mr_reg_dt' => null,
+        'mr_mod_dt' => null,
+        'mr_final_status' => null,
+        'mr_use_yn' => null,
+        'mr_etc_memo' => null,
+        'mr_homepage_url' => null,
+        'courses' => null, // Course 엔티티 배열을 저장할 속성
     ];
 
     protected $casts = [
-        'id' => 'integer',
-        'race_name' => 'string',
-        'race_date' => 'datetime',
-        'location' => 'string',
-        'distance' => 'float',
-        'max_participants' => 'integer',
-        'registration_fee' => 'float',
-        'description' => 'string',
-        'status' => 'string',
+        'mr_uuid' => 'string',
+        'mr_name' => 'string',
+        'mr_start_dt' => 'datetime',
+        'mr_location' => 'string',
+        'mr_content' => 'string',
+        'mr_company' => 'string',
+        'mr_reg_adm' => 'string',
+        'mr_final_status' => 'string',
+        'mr_use_yn' => 'string',
+        'mr_homepage_url' => 'string',
+        'courses' => 'array'
     ];
 
     /**
      * 대회 상태 상수
      */
-    const STATUS_ACTIVE = 'active';
-    const STATUS_INACTIVE = 'inactive';
-    const STATUS_COMPLETED = 'completed';
-    const STATUS_CANCELLED = 'cancelled';
+    const STATUS_ACTIVE = 'Y';
+    const STATUS_INACTIVE = 'N';
 
     /**
-     * 대회 상태 목록
-     * 
-     * @return array
+     * 대회 종료 상태 상수
      */
-    public static function getStatusList(): array
-    {
-        return [
-            self::STATUS_ACTIVE,
-            self::STATUS_INACTIVE,
-            self::STATUS_COMPLETED,
-            self::STATUS_CANCELLED
-        ];
-    }
+    const FINAL_STATUS_COMPLETED = 'Y';
+    const FINAL_STATUS_NOT_COMPLETED = 'N';
 
     /**
      * 대회가 활성 상태인지 확인
-     * 
-     * @return bool
      */
     public function isActive(): bool
     {
-        return $this->status === self::STATUS_ACTIVE;
+        return $this->mr_use_yn === self::STATUS_ACTIVE;
     }
 
     /**
-     * 대회가 완료 상태인지 확인
-     * 
-     * @return bool
+     * 대회가 종료되었는지 확인
      */
     public function isCompleted(): bool
     {
-        return $this->status === self::STATUS_COMPLETED;
+        return $this->mr_final_status === self::FINAL_STATUS_COMPLETED;
     }
 
     /**
-     * 대회가 취소 상태인지 확인
-     * 
-     * @return bool
+     * 코스 목록 설정
      */
-    public function isCancelled(): bool
+    public function setCourses(array $courses): self
     {
-        return $this->status === self::STATUS_CANCELLED;
+        $this->attributes['courses'] = $courses;
+        return $this;
+    }
+
+    /**
+     * 코스 목록 반환
+     */
+    public function getCourses(): array
+    {
+        return $this->attributes['courses'] ?? [];
     }
 } 

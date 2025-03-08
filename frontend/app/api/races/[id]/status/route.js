@@ -12,7 +12,7 @@ export async function PUT(request, { params }) {
     const { status } = await request.json();
     
     // 백엔드 API 호출
-    const response = await axios.put(`${API_URL}/races/${id}/status`, { status });
+    const response = await axios.put(`${API_URL}/race/${id}/status`, { status });
     
     return NextResponse.json(response.data);
   } catch (error) {

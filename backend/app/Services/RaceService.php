@@ -115,7 +115,7 @@ class RaceService
     }
 
     /**
-     * 마라톤 대회 삭제
+     * 마라톤 대회 삭제 (소프트 삭제)
      * 
      * @param int $id 대회 ID
      * @return bool
@@ -126,8 +126,13 @@ class RaceService
         // 대회 존재 여부 확인
         $this->getRaceById($id);
         
-        if (!$this->raceModel->delete($id)) {
-            throw new InvalidArgumentException('대회 삭제 중 오류가 발생했습니다.');
+        $updateData = [
+            'mr_use_yn' => 'N',
+            'mr_mod_dt' => date('Y-m-d H:i:s')
+        ];
+        
+        if (!$this->raceModel->update($id, $updateData)) {
+            throw new InvalidArgumentException('대회 삭제 처리 중 오류가 발생했습니다.');
         }
         
         return true;

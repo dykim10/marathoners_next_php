@@ -1,3 +1,5 @@
+'use client';
+
 export const checkSession = async () => {
     try {
         console.log("🔹 checkSession() 실행 시작...");

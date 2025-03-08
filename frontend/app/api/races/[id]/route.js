@@ -11,7 +11,7 @@ export async function GET(request, { params }) {
     const { id } = params;
     
     // 백엔드 API 호출
-    const response = await axios.get(`${API_URL}/races/${id}`);
+    const response = await axios.get(`${API_URL}/race/${id}`);
     
     return NextResponse.json(response.data);
   } catch (error) {
@@ -28,7 +28,7 @@ export async function PUT(request, { params }) {
     const raceData = await request.json();
     
     // 백엔드 API 호출
-    const response = await axios.put(`${API_URL}/races/${id}`, raceData);
+    const response = await axios.put(`${API_URL}/race/${id}`, raceData);
     
     return NextResponse.json(response.data);
   } catch (error) {
@@ -44,7 +44,7 @@ export async function DELETE(request, { params }) {
     const { id } = params;
     
     // 백엔드 API 호출
-    const response = await axios.delete(`${API_URL}/races/${id}`);
+    const response = await axios.delete(`${API_URL}/race/${id}`);
     
     return NextResponse.json(response.data);
   } catch (error) {

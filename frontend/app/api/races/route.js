@@ -8,15 +8,51 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
  */
 export async function GET(request) {
   try {
+    console.log('1. Next.js API Route: GET /api/races 요청 받음');
+    
     // URL 검색 파라미터 추출
     const { searchParams } = new URL(request.url);
     const params = Object.fromEntries(searchParams.entries());
+    console.log('2. 요청 파라미터:', params);
+    
+    // axios 설정
+    const axiosConfig = {
+      params,
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      timeout: 5000 // 5초 타임아웃
+    };
     
     // 백엔드 API 호출
-    const response = await axios.get(`${API_URL}/races`, { params });
+    const targetUrl = `${API_URL}/races`;
+    console.log('3. 백엔드 API 호출 URL:', targetUrl);
+    console.log('4. axios 설정:', axiosConfig);
+    
+    const response = await axios.get(targetUrl, axiosConfig);
+    console.log('5. 백엔드 응답:', response.data);
     
     return NextResponse.json(response.data);
   } catch (error) {
+    console.error('API 에러 발생');
+    console.error('에러 메시지:', error.message);
+    console.error('에러 설정:', {
+      baseURL: API_URL,
+      method: 'GET',
+      url: '/races',
+      params: Object.fromEntries(new URL(request.url).searchParams)
+    });
+    
+    if (error.response) {
+      // 서버가 2xx 범위를 벗어난 상태 코드로 응답한 경우
+      console.error('백엔드 응답 상태:', error.response.status);
+      console.error('백엔드 응답 데이터:', error.response.data);
+    } else if (error.request) {
+      // 요청은 보냈지만 응답을 받지 못한 경우
+      console.error('응답을 받지 못함:', error.request);
+    }
+    
     return handleApiError(error);
   }
 }
@@ -30,7 +66,12 @@ export async function POST(request) {
     const raceData = await request.json();
     
     // 백엔드 API 호출
-    const response = await axios.post(`${API_URL}/races`, raceData);
+    const response = await axios.post(`${API_URL}/races`, raceData, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+    });
     
     return NextResponse.json(response.data, { status: 201 });
   } catch (error) {

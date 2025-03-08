@@ -15,6 +15,7 @@ export default function Home() {
     const [user, setUser] = useState(null);
 
     const [raceList, setRaceList] = useState([]); // ✅ 대회 데이터 저장
+    const baseURL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
     useEffect(() => {
         const verifySession = async () => {
@@ -28,15 +29,18 @@ export default function Home() {
             }
         };
         verifySession();
-        //fetchRaceList();
+        fetchRaceList();
     }, []);
 
     const fetchRaceList = async () => {
         try {
-            const res = await fetch("/api/race/list", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ page: 1, rows: 5 }) // 최신 5개만 불러오기
+            const queryParams = new URLSearchParams({
+                page: '1',
+                rows: '5'
+            });
+            const res = await fetch(`${baseURL}/api/races?${queryParams.toString()}`, {
+                method: "GET",
+                headers: { "Content-Type": "application/json" }
             });
 
             if (!res.ok) throw new Error("Failed to fetch race list");
@@ -77,15 +81,15 @@ export default function Home() {
                         {raceList.map((race, index) => (
                             <Card key={index} className="shadow-sm">
                                 <Card.Body>
-                                    <Card.Title>{race.mrName}</Card.Title>
+                                    <Card.Title>{race.mr_name}</Card.Title>
                                     <Card.Text>
-                                        <strong>일정:</strong> {new Date(race.mrStartDt).toLocaleDateString()}
+                                        <strong>일정:</strong> {new Date(race.mr_start_dt).toLocaleDateString()}
                                     </Card.Text>
                                     <Card.Text>
-                                        <strong>장소:</strong> {race.mrLocation}
+                                        <strong>장소:</strong> {race.mr_location}
                                     </Card.Text>
                                     <Button variant="primary" size="sm"
-                                            onClick={() => router.push(`/race/view/${race.mrUuid}`)}>
+                                            onClick={() => router.push(`/race/${race.mr_uuid}`)}>
                                         상세보기
                                     </Button>
                                 </Card.Body>
@@ -105,7 +109,7 @@ export default function Home() {
                             <Card.Body>
                                 <Card.Title>🏅 대회 일정</Card.Title>
                                 <Card.Text>다가오는 마라톤 대회를 확인하세요.</Card.Text>
-                                <Button variant="primary" onClick={() => handleNavigation("/race/list")}>더 보기</Button>
+                                <Button variant="primary" onClick={() => handleNavigation("/race")}>더 보기</Button>
                             </Card.Body>
                         </Card>
                     </Col>

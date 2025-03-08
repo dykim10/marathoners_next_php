@@ -20,6 +20,13 @@ $routes->post('/api/auth/logout', 'AuthController::logout');
 
 // 마라톤 대회 API 라우트
 $routes->group('api', ['namespace' => 'App\Controllers'], function($routes) {
-    $routes->resource('races', ['controller' => 'RaceController']);
+    // 기본 CRUD 라우트
+    $routes->get('races', 'RaceController::index');
+    $routes->get('races/(:num)', 'RaceController::show/$1');
+    $routes->post('races', 'RaceController::create');
+    $routes->put('races/(:num)', 'RaceController::update/$1');
+    $routes->delete('races/(:num)', 'RaceController::delete/$1');
+    
+    // 상태 변경 라우트
     $routes->put('races/(:num)/status', 'RaceController::changeStatus/$1');
 });
