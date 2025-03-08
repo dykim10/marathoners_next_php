@@ -30,4 +30,6 @@ class UserModel extends Model
     {
         return $this->insert($user);
     }
+
+
 }
