@@ -10,14 +10,14 @@ class RaceDto
     public static function forCreate(array $data): array
     {
         return [
-            'race_name' => $data['race_name'] ?? null,
-            'race_date' => $data['race_date'] ?? null,
+            'mr_name' => $data['mr_name'] ?? null,
+            'mr_start_dt' => $data['mr_start_dt'] ?? null,
             'location' => $data['location'] ?? null,
             'distance' => $data['distance'] ?? null,
             'max_participants' => $data['max_participants'] ?? null,
             'registration_fee' => $data['registration_fee'] ?? null,
             'description' => $data['description'] ?? null,
-            'status' => $data['status'] ?? 'active',
+            'mr_use_yn' => $data['mr_use_yn'] ?? 'active',
         ];
     }
 
@@ -29,7 +29,7 @@ class RaceDto
         $updateData = [];
         
         $allowedFields = [
-            'race_name', 'race_date', 'location', 'distance', 
+            'mr_name', 'mr_start_dt', 'location', 'distance', 
             'max_participants', 'registration_fee', 'description', 'status'
         ];
         
@@ -52,7 +52,7 @@ class RaceDto
             'status' => $params['status'] ?? null,
             'date_from' => $params['date_from'] ?? null,
             'date_to' => $params['date_to'] ?? null,
-            'sort_by' => $params['sort_by'] ?? 'race_date',
+            'sort_by' => $params['sort_by'] ?? 'mr_start_dt',
             'sort_order' => $params['sort_order'] ?? 'ASC',
             'page' => (int)($params['page'] ?? 1),
             'limit' => (int)($params['limit'] ?? 10),
@@ -66,9 +66,9 @@ class RaceDto
     {
         return [
             'id' => $race['id'],
-            'race_name' => $race['race_name'],
-            'race_date' => $race['race_date'],
-            'location' => $race['location'],
+            'mr_name' => $race['mr_name'],
+            'mr_start_dt' => $race['mr_start_dt'],
+            'mr_location' => $race['mr_location'],
             'distance' => $race['distance'],
             'max_participants' => $race['max_participants'],
             'registration_fee' => $race['registration_fee'],
