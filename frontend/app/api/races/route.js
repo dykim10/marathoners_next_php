@@ -34,6 +34,7 @@ export async function GET(request) {
     console.log('5. 백엔드 응답:', response.data);
     
     return NextResponse.json(response.data);
+
   } catch (error) {
     console.error('API 에러 발생');
     console.error('에러 메시지:', error.message);

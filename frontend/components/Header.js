@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { checkSession } from "@/utils/session";
+import { checkSession } from "../utils/session";
 import { Navbar, Nav, NavDropdown, Container, Button } from "react-bootstrap";
 import Link from "next/link";
 
@@ -14,10 +14,7 @@ export default function Header() {
 
     useEffect(() => {
         const verifySession = async () => {
-            console.log("🔹 세션 확인 중...");
             const sessionData = await checkSession();
-            console.log("🔹 세션 데이터:", sessionData);
-
             setIsLoggedIn(sessionData.success);
             setUser(sessionData.user);
         };

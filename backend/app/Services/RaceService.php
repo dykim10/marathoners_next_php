@@ -30,6 +30,9 @@ class RaceService
         // 모델을 통해 데이터 조회
         $result = $this->raceModel->getRaces($filters);
         
+        // echo json_encode($result);
+        // exit;
+
         // DTO를 통해 응답 데이터 변환
         return RaceDto::forListResponse($result['data'], $result['pager']);
     }

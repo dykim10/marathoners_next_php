@@ -4,7 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from "react";
 import { Container, Row, Col, Button, Card } from 'react-bootstrap';
-import { checkSession } from "@/utils/session";
+import { checkSession } from "../utils/session";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
