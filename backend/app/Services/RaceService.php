@@ -34,7 +34,15 @@ class RaceService
         // exit;
 
         // DTO를 통해 응답 데이터 변환
-        return RaceDto::forListResponse($result['data'], $result['pager']);
+        $totalCount = $result['totalCount'];
+        $page = $result['page'];
+        $rows = $result['rows'];
+
+        // $totalCount가 배열인 경우 정수로 변환
+        $totalCountInt = is_array($totalCount) ? count($totalCount) : (int)$totalCount;
+        $response = RaceDto::forListResponse($result['data'], $totalCountInt, $page, $rows);
+
+        return $response;
     }
 
     /**
@@ -157,5 +165,39 @@ class RaceService
         }
         
         return $this->updateRace($id, ['status' => $status]);
+    }
+
+    /**
+     * 대회 목록을 조회하는 메소드 (예시)
+     * 
+     * @param int $page 페이지 번호
+     * @param int $rows 페이지당 행 수
+     * @return array
+     */
+    public function getRaces(int $page, int $rows)
+    {
+        try {
+            // 대회 목록 조회
+            $races = $this->raceModel->findAll($page, $rows);
+            
+            // 전체 대회 수 조회
+            $totalCount = $this->raceModel->countAll();
+            
+            // 응답 데이터 생성
+            return [
+                'success' => true,
+                'data' => [
+                    'totalCount' => $totalCount,
+                    'page' => $page,
+                    'rows' => $rows,
+                    'items' => RaceDto::forListResponse($races, $totalCount, $page, $rows)
+                ]
+            ];
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'error' => $e->getMessage()
+            ];
+        }
     }
 }

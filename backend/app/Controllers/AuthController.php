@@ -34,39 +34,72 @@ class AuthController extends ResourceController
 
     /**
      * JWT 토큰 검증 API
+     * 
+     * @return Response
      */
     public function verifyToken()
     {
         try {
-
-            log_message('debug', '🔹 요청 수신: verifyToken() 실행됨');
-
-            // ✅ 전체 쿠키 로그 확인
-            log_message('debug', '🔹 $_SERVER[HTTP_COOKIE]: ' . ($_SERVER['HTTP_COOKIE'] ?? '없음'));
-            log_message('debug', '🔹 $_COOKIE 데이터: ' . json_encode($_COOKIE));
-
-            // ✅ Authorization 헤더에서 JWT 가져오기 (API 테스트용)
-            $authHeader = $this->request->getHeaderLine('Authorization');
-            if ($authHeader && strpos($authHeader, 'Bearer ') === 0) {
-                $token = str_replace('Bearer ', '', $authHeader);
-                log_message('debug', '🔹 Authorization 헤더에서 JWT 추출: ' . $token);
-            } else {
-                // ✅ HTTP-Only Secure 쿠키에서 JWT 가져오기 (브라우저 요청용)
-                $token = $_COOKIE['token'] ?? null;
-                log_message('debug', '🔹 HTTP-Only Secure 쿠키에서 JWT 추출: ' . ($token ? '있음' : '없음'));
-            }
-
+            // JWT 토큰 검증 로직
+            $token = $this->getTokenFromRequest();
+            
             if (!$token) {
-                return $this->failUnauthorized('토큰이 없습니다.');
+                // 토큰이 없는 경우 401 대신 200 상태 코드와 함께 인증되지 않음을 반환
+                return $this->response->withJson([
+                    'success' => true,
+                    'isAuthenticated' => false,
+                    'user' => null,
+                    'message' => '로그인이 필요합니다.'
+                ], 200);
             }
-
-            $result = $this->authService->validateToken($token);
-            return $this->respond($result, $result['success'] ? 200 : 401);
-        } catch (Exception $e) {
-
-            log_message('error', '❌ JWT 검증 오류: ' . $e->getMessage());
-            return $this->failServerError('토큰 검증 중 오류가 발생했습니다.');
+            
+            // 토큰 검증 로직
+            $userData = $this->authService->validateToken($token);
+            
+            if (!$userData) {
+                // 토큰이 유효하지 않은 경우도 200 상태 코드와 함께 인증되지 않음을 반환
+                return $this->response->withJson([
+                    'success' => true,
+                    'isAuthenticated' => false,
+                    'user' => null,
+                    'message' => '세션이 만료되었습니다. 다시 로그인해주세요.'
+                ], 200);
+            }
+            
+            // 토큰이 유효한 경우
+            return $this->response->withJson([
+                'success' => true,
+                'isAuthenticated' => true,
+                'user' => $userData
+            ], 200);
+        } catch (\Exception $e) {
+            // 실제 오류가 발생한 경우에만 오류 응답
+            return $this->response->withJson([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
         }
+    }
+
+    /**
+     * 요청에서 토큰 추출
+     * 
+     * @return string|null
+     */
+    private function getTokenFromRequest()
+    {
+        // 쿠키에서 토큰 추출
+        $token = isset($_COOKIE['token']) ? $_COOKIE['token'] : null;
+        
+        // 헤더에서 토큰 추출 (쿠키에 없는 경우)
+        if (!$token && isset($_SERVER['HTTP_AUTHORIZATION'])) {
+            $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
+            if (strpos($authHeader, 'Bearer ') === 0) {
+                $token = substr($authHeader, 7);
+            }
+        }
+        
+        return $token;
     }
 
     public function logout()

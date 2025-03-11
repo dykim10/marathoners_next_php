@@ -36,6 +36,7 @@ export async function GET(request) {
     return NextResponse.json(response.data);
 
   } catch (error) {
+    
     console.error('API 에러 발생');
     console.error('에러 메시지:', error.message);
     console.error('에러 설정:', {

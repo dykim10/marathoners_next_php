@@ -8,47 +8,45 @@ import { checkSession } from "../utils/session";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { useAuth } from '../components/AuthProvider';
+import api from '../utils/api';
 
 export default function Home() {
     const router = useRouter();
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [user, setUser] = useState(null);
+    const { isAuthenticated, user, isLoading, authMessage } = useAuth();
+    const [races, setRaces] = useState([]);
+    const [error, setError] = useState('');
+    const [isLoadingRaces, setIsLoadingRaces] = useState(false);
 
-    const [raceList, setRaceList] = useState([]); // ✅ 대회 데이터 저장
     const baseURL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
     useEffect(() => {
-        const verifySession = async () => {
-            try {
-                const sessionData = await checkSession();
-                setIsLoggedIn(sessionData.success);
-                setUser(sessionData.user);
+        // 인증 상태가 로드된 후에만 대회 데이터 로드 시도
+        if (!isLoading) {
+            loadRaces();
+        }
+    }, [isLoading]);
 
-            } catch (error) {
-                console.error("세션 확인 중 오류 발생:", error);
-            }
-        };
-        verifySession();
-        fetchRaceList();
-    }, []);
-
-    const fetchRaceList = async () => {
+    const loadRaces = async () => {
         try {
-            const queryParams = new URLSearchParams({
-                page: '1',
-                rows: '5'
+            setIsLoadingRaces(true);
+            setError('');
+            
+            // 인증 여부와 관계없이 API 호출 시도
+            const response = await api.get('/races', {
+                params: { page: 1, rows: 5 }
             });
-            const res = await fetch(`${baseURL}/api/races?${queryParams.toString()}`, {
-                method: "GET",
-                headers: { "Content-Type": "application/json" }
-            });
-
-            if (!res.ok) throw new Error("Failed to fetch race list");
-
-            const data = await res.json();
-            setRaceList(data.raceList || []); // 데이터 저장
-        } catch (error) {
-            console.error("Error fetching races:", error);
+            
+            setRaces(response.data.items || []);
+        } catch (err) {
+            console.error('대회 데이터 로드 중 오류 발생:', err);
+            
+            // 401 오류는 이미 인터셉터에서 처리되므로 여기서는 다른 오류만 처리
+            if (!err.response || err.response.status !== 401) {
+                setError('대회 데이터를 불러오는 중 오류가 발생했습니다.');
+            }
+        } finally {
+            setIsLoadingRaces(false);
         }
     };
 
@@ -67,6 +65,10 @@ export default function Home() {
         arrows: false,
     };
 
+    if (isLoading) {
+        return <div>로딩 중...</div>;
+    }
+
     return (
         <Container className="container-lg mt-5 text-center">
             {/* ✅ 헤딩 섹션 */}
@@ -76,43 +78,48 @@ export default function Home() {
 
             {/* ✅ 대회 일정 스와이프 섹션 */}
             <Container className="mb-5">
-                {raceList.length > 0 ? (
-                    <Slider {...sliderSettings}>
-                        {raceList.map((race, index) => (
-                            <Card key={index} className="shadow-sm">
-                                <Card.Body>
-                                    <Card.Title>{race.mr_name}</Card.Title>
-                                    <Card.Text>
-                                        <strong>일정:</strong> {new Date(race.mr_start_dt).toLocaleDateString()}
-                                    </Card.Text>
-                                    <Card.Text>
-                                        <strong>장소:</strong> {race.mr_location}
-                                    </Card.Text>
-                                    <Button variant="primary" size="sm"
-                                            onClick={() => router.push(`/race/${race.mr_uuid}`)}>
-                                        상세보기
-                                    </Button>
-                                </Card.Body>
-                            </Card>
-                        ))}
-                    </Slider>
+                {isAuthenticated ? (
+                    <div>
+                        <h2>최근 대회 목록</h2>
+                        {isLoadingRaces ? (
+                            <p>대회 정보 로딩 중...</p>
+                        ) : error ? (
+                            <p className="error">{error}</p>
+                        ) : races.length > 0 ? (
+                            <Slider {...sliderSettings}>
+                                {races.map((race, index) => (
+                                    <Card key={index} className="shadow-sm">
+                                        <Card.Body>
+                                            <Card.Title>{race.name}</Card.Title>
+                                            <Card.Text>
+                                                <strong>일정:</strong> {new Date(race.startDate).toLocaleDateString()}
+                                            </Card.Text>
+                                            <Card.Text>
+                                                <strong>장소:</strong> {race.location}
+                                            </Card.Text>
+                                            <Button variant="primary" size="sm"
+                                                    onClick={() => router.push(`/race/${race.uuid}`)}>
+                                                상세보기
+                                            </Button>
+                                        </Card.Body>
+                                    </Card>
+                                ))}
+                            </Slider>
+                        ) : (
+                            <p>등록된 대회가 없습니다.</p>
+                        )}
+                    </div>
                 ) : (
-                    <p>대회 정보를 불러오는 중...</p>
+                    <div>
+                        <p>{authMessage || '로그인이 필요합니다.'}</p>
+                        <Button variant="primary" onClick={() => handleNavigation("/login")}>로그인</Button>
+                    </div>
                 )}
             </Container>
 
             {/* ✅ 기능 버튼 섹션 */}
             <Container>
                 <Row className="justify-content-center">
-                    <Col md={4} className="mb-3">
-                        <Card className="shadow-sm">
-                            <Card.Body>
-                                <Card.Title>🏅 대회 일정</Card.Title>
-                                <Card.Text>다가오는 마라톤 대회를 확인하세요.</Card.Text>
-                                <Button variant="primary" onClick={() => handleNavigation("/race")}>더 보기</Button>
-                            </Card.Body>
-                        </Card>
-                    </Col>
                     <Col md={4} className="mb-3">
                         <Card className="shadow-sm">
                             <Card.Body>
