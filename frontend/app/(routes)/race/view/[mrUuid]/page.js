@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Button, Container, Card, Table } from "react-bootstrap";
-import { RACE_TYPES } from "@/constants/raceTypes";
-import { checkSession } from "@/utils/session";
+import { RACE_TYPES } from "/constants/raceTypes";
+import { checkSession } from "/utils/session";
 
 export default function RaceDetailPage() {
     const { mrUuid } = useParams();

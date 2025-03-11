@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Container, Form, Button, Card, Alert } from "react-bootstrap";
-import { checkSession } from "@/utils/session"; //
+import { checkSession } from "/utils/session";
 
 export default function LoginPage() {
     const router = useRouter();
