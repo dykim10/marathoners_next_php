@@ -15,7 +15,7 @@ export default function LoginPage() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userData, setUserData] = useState(null);
 
-    // ✅ 로그인 상태 확인 (JWT가 쿠키에 존재하는지 검증)
+    // 로그인 상태 확인 (JWT가 쿠키에 존재하는지 검증)
     useEffect(() => {
         const verifySession = async () => {
             const sessionData = await checkSession();
